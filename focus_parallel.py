@@ -1,5 +1,5 @@
 import jax.numpy as np
-from jax import jit, grad, vmap
+from jax import jit, grad, vmap, pmap, device_count
 from jax.config import config
 import tables as tb
 import time
@@ -18,6 +18,12 @@ sg = np.load("sg.npy")
 r_surf = np.load("r_surf.npy")
 with tb.open_file("coils.hdf5", "r") as f:
 	fc = np.asarray(f.root.coilSeries[:, :, :])
+
+num_devices = device_count()
+assert nn.shape[0] % num_devices == 0
+nn = np.reshape(nn, (num_devices, nn.shape[0] // num_devices, nn.shape[1], nn.shape[2]))
+r_surf = np.reshape(r_surf, (num_devices, r_surf.shape[0] // num_devices, r_surf.shape[1], r_surf.shape[2]))
+sg = np.reshape(sg, (num_devices, sg.shape[0] // num_devices, sg.shape[1]))
 
 #######################################################################
 # Calculating Objective Function
@@ -41,7 +47,7 @@ def r(fc, theta):
 def loss(r_surf, nn, sg, weight, fc):
 	l = r(fc, theta)
 	dl = l[:,:-1,:] - l[:,1:,:]
-	return quadratic_flux(r_surf, nn, sg, dl, l[:,:-1,:]) + weight * np.sum(dl)
+	return np.sum(pmap_quadratic_flux(r_surf, nn, sg, dl, l[:,:-1,:])) + weight * np.sum(dl)
 
 #######################################################################
 # JAX/Python Function Transformations
@@ -58,6 +64,10 @@ grad_func = grad(objective_function) # d output / d input
 
 # jit-compile (JAX)
 jit_grad_func = jit(grad_func)
+
+# SPMP parallelization (JAX)
+pmap_quadratic_flux = pmap(quadratic_flux, in_axes=(0, 0, 0, None, None))
+
 
 #######################################################################
 # Optimization
