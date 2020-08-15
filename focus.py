@@ -4,6 +4,7 @@ from jax.config import config
 import tables as tb
 import time
 from functools import partial
+import numpy as numpy
 
 #######################################################################
 # Reading in Data
@@ -71,3 +72,7 @@ for n in range(N):
 	print(n)
 		
 print("loss is {}".format(objective_function(fc)))
+
+
+with tb.open_file("coils_final.hdf5", "w") as f:
+	f.create_array("/", "coilSeries", numpy.asarray(fc))
