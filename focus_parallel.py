@@ -10,7 +10,7 @@ from functools import partial
 #######################################################################
 
 NS = 32
-N = 10
+N = 100
 lr = 0.0001
 theta = np.linspace(0, 2 * np.pi, NS + 1)
 nn = np.load("nn.npy")
@@ -79,5 +79,5 @@ for n in range(N):
 	grad = jit_grad_func(p)
 	p = p - grad * lr
 	print(n)
-		
+
 print("loss is {}".format(objective_function(p)))
