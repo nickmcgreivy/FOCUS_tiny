@@ -1,0 +1,35 @@
+FROM debian:latest
+
+MAINTAINER Chris Smiet  <chris.smiet@gmail.com>
+
+# Install core debian packages
+USER root
+ENV DEBIAN_FRONTEND noninteractive
+RUN apt-get update && apt-get -yq dist-upgrade \
+    && apt-get install -yq --no-install-recommends \
+    gcc \
+    python3 \
+    python3-pip \
+    && apt-get clean
+
+
+
+
+# Upgrade the package managers
+RUN pip3 install --upgrade pip
+
+# Install Python packages
+RUN pip3 install h5py && \
+    pip3 install numpy && \
+    pip3 install scipy && \
+    pip3 install ipython && \
+    pip3 install matplotlib && \
+    pip3 install tables 
+
+
+RUN pip3 install jax && \
+    pip3 install jaxlib 
+
+
+CMD ipython
+#ENTRYPOINT [python]

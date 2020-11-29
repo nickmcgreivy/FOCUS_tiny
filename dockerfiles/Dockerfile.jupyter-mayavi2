@@ -1,0 +1,60 @@
+FROM jupyter/scipy-notebook
+
+MAINTAINER Chris Smiet  <chris.smiet@gmail.com>
+
+# Install core debian packages
+USER root
+ENV DEBIAN_FRONTEND noninteractive
+RUN apt-get update && apt-get -yq dist-upgrade \
+    && apt-get install -yq --no-install-recommends \
+    curl \
+    gcc \
+    && apt-get clean
+
+#    openssh-client \
+#    vim \
+
+
+# Xvfb
+RUN apt-get install -yq --no-install-recommends \
+    xvfb \
+    x11-utils \
+    libx11-dev \
+    qt5-default \
+    && apt-get clean
+
+ENV DISPLAY=:99
+
+# Switch to notebook user
+USER $NB_UID
+
+# Upgrade the package managers
+RUN pip install --upgrade pip
+RUN npm i npm@latest -g
+
+# Install Python packages
+RUN pip install vtk && \
+    pip install h5py && \
+    pip install nose && \
+    pip install ipyevents && \
+    pip install ipywidgets && \
+    pip install mayavi && \
+    pip install numpy && \
+    pip install pillow && \
+    pip install pyqt5 && \
+    pip install scikit-learn && \
+    pip install scipy && \
+    pip install jax && \
+    pip install jaxlib && \
+    pip install xvfbwrapper
+
+# Install Jupyter notebook extensions
+RUN jupyter nbextension install mayavi --py --sys-prefix && \
+    jupyter nbextension enable mayavi --py --sys-prefix && \
+    npm cache clean --force
+
+# Try to decrease initial IPython kernel load times
+#RUN ipython -c "import matplotlib.pyplot as plt; print(plt)"
+
+# Add an x-server to the entrypoint. This is needed by Mayavi
+ENTRYPOINT ["tini", "-g", "--", "xvfb-run"]
