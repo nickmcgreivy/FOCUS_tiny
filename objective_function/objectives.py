@@ -305,7 +305,7 @@ def vector_potential_indexed(coil_i, segment_j, ll, dl, I_arr):
     #bottom_cleaned = bottom.at[coil_i, :].set(1) #set the zero value to something before division
     bottom_inv = 1/bottom
     segment_length = np.linalg.norm(dl[coil_i, segment_j, :])
-    replacement_value = 1/tube_vector_potential(segment_length, .01)
+    replacement_value = tube_vector_potential(segment_length, .01)
     bottom_inv_cleaned = bottom_inv.at[coil_i, segment_j].set(replacement_value)
     #bottom_cleaned = index_update(bottom_inv, [coil_i, segment_j], 0)
     #A = np.sum(top / bottom_cleaned[:, :, None], axis=(0, 1))
@@ -346,7 +346,7 @@ def total_energy(objective_array):
     #pc = p2pc(p)
     closed_l = r(p, cfg.theta)
     ll = closed_l[:, :-1, :]
-    dl = closed_l[:, :-1, :] - closed_l[:, 1:, :]
+    dl = closed_l[:, 1:, :] - closed_l[:, :-1, :] #in the right direction!
     midpointgrid = 0.5 * np.hstack((ll[:, :-1, :] + ll[:, 1:, :],
                                     (ll[:, 0, :] + ll[:, -1, :])[:, None, :]))
     coil_idx = np.array(range(ll.shape[0]))
