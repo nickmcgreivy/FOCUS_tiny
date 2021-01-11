@@ -2,7 +2,7 @@ from jax.config import config
 config.update("jax_enable_x64", True)
 import jax.numpy as np
 import h5py
-import tables as tb
+#import tables as tb
 import numpy as numpy
 from objective_function import objective_and_gradient,  make_array, array2I_arr, array2both, array2p
 from objective_function import quadratic_flux_error, total_energy, toroidal_flux, coil_length
@@ -70,9 +70,9 @@ for energy_weight in [.0003,]:
     # objective_array = res.x
     callbackF(res.x)
     results.append(res)
-    with tb.open_file("coils_force_{}.hdf5".format(energy_weight), "w") as f:
-        f.create_array("/", "coilSeries", numpy.asarray(array2p(res.x)))
-        f.create_array("/", "I_arr", numpy.asarray(array2I_arr(res.x)))
+#    with tb.open_file("coils_force_{}.hdf5".format(energy_weight), "w") as f:
+#        f.create_array("/", "coilSeries", numpy.asarray(array2p(res.x)))
+#        f.create_array("/", "I_arr", numpy.asarray(array2I_arr(res.x)))
 
 
 

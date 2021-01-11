@@ -6,7 +6,7 @@ from jax import jit, grad, vmap
 from objective_function import config as cfg
 
 from jax.config import config
-import tables as tb
+#import tables as tb
 from functools import partial
 import numpy as numpy
 import scipy.optimize as optimize
